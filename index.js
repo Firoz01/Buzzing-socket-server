@@ -7,7 +7,14 @@ const server = require("http").Server(app);
 
 app.use(cors());
 
-const io = (module.exports.io = require("socket.io")(server));
+// const io = (module.exports.io = require("socket.io")(server));
+
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
 
 const PORT = process.env.PORT || 8800;
 
