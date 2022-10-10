@@ -1,20 +1,16 @@
 const express = require("express");
 const app = express();
 
-const PORT = 8800;
-const http = require("http").Server(app);
+const server = require("http").Server(app);
 
-const io = require("socket.io")(http, {
-  cors: {
-    origin: "http://localhost:3000",
-  },
-});
+const io = (module.exports.io = require("socket.io")(server));
 
-app.get("/", (req, res) => res.send("working fine"));
+const PORT = process.env.PORT || 8800;
 
 let activeUsers = [];
 
 io.on("connection", (socket) => {
+  console.log("client connected");
   // add new User
   socket.on("new-user-add", (newUserId) => {
     // if user is not added previously
@@ -46,6 +42,6 @@ io.on("connection", (socket) => {
   });
 });
 
-http.listen(PORT, function () {
+server.listen(PORT, () => {
   console.log(`listening on ${PORT}`);
 });
