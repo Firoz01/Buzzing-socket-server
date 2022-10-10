@@ -11,7 +11,7 @@ app.use(cors());
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://buzzing.netlify.app",
     methods: ["GET", "POST"],
   },
 });
@@ -33,14 +33,6 @@ io.on("connection", (socket) => {
     io.emit("get-users", activeUsers);
   });
 
-  socket.on("disconnect", () => {
-    // remove user from active users
-    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
-    console.log("User Disconnected", activeUsers);
-    // send all active users to all users
-    io.emit("get-users", activeUsers);
-  });
-
   // send message to a specific user
   socket.on("send-message", (data) => {
     const { receiverId } = data;
@@ -49,7 +41,16 @@ io.on("connection", (socket) => {
     console.log("Data: ", data);
     if (user) {
       io.to(user.socketId).emit("receive-message", data);
+      console.log("user found", user);
     }
+  });
+
+  socket.on("disconnect", () => {
+    // remove user from active users
+    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
+    console.log("User Disconnected", activeUsers);
+    // send all active users to all users
+    io.emit("get-users", activeUsers);
   });
 });
 
