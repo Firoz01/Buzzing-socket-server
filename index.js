@@ -1,8 +1,16 @@
-const io = require("socket.io")(8800, {
+const express = require("express");
+const app = express();
+
+const PORT = 8800;
+const http = require("http").Server(app);
+
+const io = require("socket.io")(http, {
   cors: {
     origin: "http://localhost:3000",
   },
 });
+
+app.get("/", (req, res) => res.send("working fine"));
 
 let activeUsers = [];
 
@@ -36,4 +44,8 @@ io.on("connection", (socket) => {
       io.to(user.socketId).emit("receive-message", data);
     }
   });
+});
+
+http.listen(PORT, function () {
+  console.log(`listening on ${PORT}`);
 });
